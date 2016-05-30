@@ -17,8 +17,8 @@ rest = mod(length(Input),foldSize);
 iFold = mat2cell(training_data,[nFolds,rest],[19]);
 oFold = mat2cell(Output',[nFolds,rest],[3]);
 
-positionError = {};
-orientationError = {};
+positionErrors = {};
+orientationErrors = {};
 
 weights = {};
 
@@ -33,23 +33,19 @@ for p=1:6
         % Testing
         testY = [iFold{k}(:,1:1+p*3)] * w;
         Errors = ((testY-oFold{k}).^2).^(0.5);
-        positionErrors = sum(Errors(:,1:2))/length(Errors);
-        orientError = sum(Errors(:,3))/length(Errors);
-        positionError{p,j} = [positionErrors(1)+positionErrors(2)];
-        orientationError{p,j} = [orientError];
-
+        positionErrors{p,j} = sum(Errors(:,1)+Errors(:,2))/length(Errors);
+        orientationErrors{p,j} = sum(Errors(:,3))/length(Errors);
     end
 end
-cell2mat(positionError);
-[m,i] = min(cell2mat(positionError));
-[M,I] = min(m);
-index = [i(I), I];  % row col of min Error in positionError cell
+positionErrors = cell2mat(positionErrors);
+
+[m,poldeg] = min(mean(positionErrors')'); 
+[M,fold  ] = min(positionErrors(poldeg,:));
+index = [poldeg, fold];  % row col of min Error in positionError cell
 
 par{1} = weights{index(1),index(2)}(:,1);
 par{2} = weights{index(1),index(2)}(:,2);
 par{3} = weights{index(1),index(2)}(:,3);
-
-
 
 end
 
