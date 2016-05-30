@@ -46,7 +46,7 @@ likelihood = zeros(length(t10k),10);
 
 for i=0:9
     projection = W'*testData{i+1};
-    mu = meanClasses{i+1};   % TODO meanClasses{i+1};          
+    mu = meanClassesProj{i+1};   % TODO meanClasses{i+1};          
     cova = covClasses{i+1};
     likelihood(:,i+1) = mvnpdf(projection',mu,cova);
 end
