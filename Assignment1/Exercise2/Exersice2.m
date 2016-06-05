@@ -1,92 +1,65 @@
-tic;
-clear all
-%% Parameters
-d = 15;
- 
-images = loadMNISTImages('train-images.idx3-ubyte');
-labels = loadMNISTLabels('train-labels.idx1-ubyte');
-t10k = loadMNISTImages('t10k-images.idx3-ubyte');
-l10k = loadMNISTLabels('t10k-labels.idx1-ubyte');
+function [ d_opt,minError,C ] = Exersice2( d_max )
+%EXERSICE2
+    tic;
+    %% Input
+    len = d_max;
+    
+    %% Parameters
+    images = loadMNISTImages('train-images.idx3-ubyte');
+    labels = loadMNISTLabels('train-labels.idx1-ubyte');
+    t10k = loadMNISTImages('t10k-images.idx3-ubyte');
+    l10k = loadMNISTLabels('t10k-labels.idx1-ubyte');
 
-% m1 = mean2(images);                 % calc mean of all images
-% zeroMeanImages = images - m1;        % create zero mean image
-% s = cov(zeroMeanImages');
-% [v , u] = eig(s);
-% u = diag(u);
-% [u,i] = sort(u,'descend');
-% 
-% W = v(:,i(1:d));                    % calculate base
-% y = W'*images;                      % Project base
-% 
-% %% Calculate Training Mean and Covariance
-% 
-% meanClasses = cell(1,10);
-% covClassesProj = cell(1,10);
-% meanClassesProj = cell(1,10);
-% 
-% for i=0:9
-%     label = find(labels == i);
-%     class = images(:,label);
-%     proj = W'*class;
-%     meanClasses{i+1} = mean2(class); 
-%     meanClassesProj{i+1} = mean2(proj);
-%     covClassesProj{i+1} = cov(proj');
-% end
-% 
-% %% Associate Classes
-% 
-% likelihood = zeros(length(t10k),10);
-% 
-% for i=0:9
-%     projection = W'*(t10k-meanClasses{i+1});
-%     mu = meanClassesProj{i+1};   % TODO meanClasses{i+1};          
-%     cova = covClassesProj{i+1};
-%     likelihood(:,i+1) = mvnpdf(projection',mu,cova);
-% end
-%   
-% [winners,index] = max(likelihood,[],2);
-% prediction = index-1;
-% match = prediction==l10k;
-% matchRate = sum(match)/length(match);
-% missclassificationRate = 1-matchRate;
-% 
-% [C,order] = confusionmat(l10k,prediction);
+    d_x   = (1:1:len);
+    matchRate = zeros(1,len);
+    missmatchRate = zeros(1,len);
+    predicitions = cell(1,len);
 
-len = 60;
+    %% Perform Performance Checking of d vlaues From 1 to 60
 
-matchRate = zeros(1,len);
-missmatchRate = zeros(1,len);
+    for d=1:len
+        disp([mat2str(round((100/len)*d)),' %']);
+        [m,prediction] = classification(d,images,labels,t10k,l10k);
+        matchRate(d) = m;
+        missmatchRate(d) = 1-m;
+        predicitions{d} = prediction;
+    end
 
-d_x   = [1:1:len];
+    [v,i] = max(matchRate);
+    classificationResult = predicitions{i};
+    
+    % Results
+    d_opt = i;
+    minError = 1-v;
+    C = confusionmat(l10k,classificationResult);
 
-for d=1:len
-    disp(d);
-    [m,mis] = classification(d,images,labels,t10k,l10k);
-    matchRate(d) = m;
-    missmatchRate(d) = mis;
+
+    %% Display Results
+
+    disp(['Best value of d: ', mat2str(i)]);
+    disp(['Match rate: ', mat2str(v*100), '%']);
+    disp(['Error for d = 15: ',mat2str(missmatchRate(15)*100), '%']);
+
+    % --> uncomment this part to plot confusion matrix 
+    %figure;
+    %plotconfusion(l10k,classificationResult);
+
+    figure;
+    scatter(d_x,matchRate);
+    xlabel('d')
+    ylabel('Match Rate')
+    title('Match Rate over values of d')
+    grid on
+    axis([0 60 0 1]);
+    figure;
+    scatter(d_x,missmatchRate);
+    xlabel('d')
+    ylabel('Missmatch Rate')
+    title('Missmatch Rate over values of d')
+    grid on
+    axis([0 60 0 1]);
+
+    toc;
+
 end
 
-figure;
-scatter(d_x,matchRate);
-xlabel('d')
-ylabel('Match Rate')
-title('Match Rate over values of d')
-grid on
-axis([0 60 0 1]);
-figure;
-scatter(d_x,missmatchRate);
-xlabel('d')
-ylabel('Missmatch Rate')
-title('Missmatch Rate over values of d')
-grid on
-axis([0 60 0 1]);
-
-
-
-
-
-
-
-
-
-toc;
