@@ -1,4 +1,4 @@
-function [ d_opt,minError,C ] = Exersice2( d_max )
+function [ d_opt,minError,C ] = Exercise2( d_max )
 %EXERSICE2
     tic;
     %% Input

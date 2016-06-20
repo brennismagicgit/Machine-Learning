@@ -1,4 +1,4 @@
-function [ par ] = Exersice1( K )
+function [ par ] = Exercise1( K )
 %EXERSICE1
 
 % This matlab Funtion produces the par cell with Trained Parameters for
