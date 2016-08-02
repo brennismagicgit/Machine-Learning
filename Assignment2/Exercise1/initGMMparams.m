@@ -1,6 +1,5 @@
 function [ means,Covs,priors,Clusters] = initGMMparams( Data,k )
-%INITGMMPARAMS Summary of this function goes here
-%   Detailed explanation goes here
+%This function initializes the Parameters for a GMM
     [ci,means]=kmeans(Data',k); % Cluster Means
     priors = ones(k,1)*1/k;     % uniform priors
     Covs   = cell(k,1);         
